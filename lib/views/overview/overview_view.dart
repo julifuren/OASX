@@ -194,15 +194,15 @@ class _SchedulerWidget extends StatelessWidget {
         Obx(() {
           return switch (controller.scriptModel.state.value) {
             ScriptState.running => const SpinKitChasingDots(
-                color: Colors.green,
+                color: AppColors.success,
                 size: 22,
               ),
             ScriptState.inactive =>
               const Icon(Icons.donut_large, size: 24, color: Colors.grey),
             ScriptState.warning =>
-              const SpinKitDoubleBounce(color: Colors.orange, size: 24),
+              const SpinKitDoubleBounce(color: AppColors.warning, size: 24),
             ScriptState.updating => const Icon(Icons.browser_updated_rounded,
-                size: 24, color: Colors.blue),
+                size: 24, color: AppColors.primary),
           };
         }),
         // 一键重启：停止 -> 等状态离开 running -> 启动

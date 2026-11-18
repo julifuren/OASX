@@ -17,25 +17,22 @@ class TreeMenuView extends StatelessWidget {
   }
 
   Widget _desktop(NavCtrl controller, Map<String, List<String>> data) {
-    return TreeView(
+    return SimpleTree(
             data: data,
-            onTap: (e) {
-              controller.switchContent(e);
-            })
-        .constrained(width: 180)
+            selected: controller.selectedMenu.value,
+            onTap: controller.switchContent)
+        .constrained(width: 184)
         .alignment(Alignment.topLeft)
-        .card(margin: const EdgeInsets.all(0))
         .padding(bottom: 10);
   }
 
   Widget _mobile(NavCtrl controller, Map<String, List<String>> data,
       BuildContext context) {
-    return TreeView(
+    return SimpleTree(
             data: data,
-            onTap: (e) {
-              controller.switchContent(e);
-            })
-        .constrained(width: 180)
+            selected: controller.selectedMenu.value,
+            onTap: controller.switchContent)
+        .constrained(width: 184)
         .alignment(Alignment.topLeft)
         .padding(top: 30)
         .decorated(color: Theme.of(context).scaffoldBackgroundColor);

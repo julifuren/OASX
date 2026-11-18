@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:easy_rich_text/easy_rich_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oasx/config/ui.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'log_mixin.dart';
 
@@ -341,16 +342,18 @@ class _LogFilterBarState extends State<_LogFilterBar> {
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                   color: active && level == LogLevelFilter.error
-                      ? Colors.red
-                      : dividerColor),
-              color: active ? Colors.orange.withValues(alpha: 0.12) : null,
+                      ? AppColors.danger
+                      : (active ? AppColors.primary : dividerColor)),
+              color: active ? AppColors.primarySoft : null,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.filter_alt_outlined,
                     size: 15,
-                    color: level == LogLevelFilter.error ? Colors.red : null),
+                    color: level == LogLevelFilter.error
+                    ? AppColors.danger
+                    : (active ? AppColors.primary : null)),
                 const SizedBox(width: 3),
                 Text(_label(level), style: const TextStyle(fontSize: 11)),
               ],
@@ -504,9 +507,9 @@ class LogContent extends StatelessWidget {
               final isWarning = upper.contains('WARNING');
               return Container(
                 color: isError
-                    ? Colors.red.withValues(alpha: 0.10)
+                    ? AppColors.danger.withValues(alpha: 0.07)
                     : isWarning
-                        ? Colors.orange.withValues(alpha: 0.08)
+                        ? AppColors.warning.withValues(alpha: 0.07)
                         : null,
                 padding:
                     const EdgeInsets.symmetric(vertical: 1, horizontal: 4),

@@ -6,39 +6,39 @@ class AppColors {
   AppColors._();
 
   /// 页面底色，不用纯白
-  static const bg = Color(0xFFF3F4F6);
+  static const bg = Color(0xFFF6F7F9);
 
   /// 渐变侧栏的起止色（比底色略深一点点，做出层次）
-  static const railTop = Color(0xFFFBFBFD);
-  static const railBottom = Color(0xFFF0F1F5);
+  static const railTop = Color(0xFFFCFCFD);
+  static const railBottom = Color(0xFFF2F3F6);
 
   /// 卡片
   static const card = Color(0xFFFFFFFF);
 
-  /// 主色（靛紫）
-  static const primary = Color(0xFF6366F1);
-  static const primarySoft = Color(0xFFEEF0FF);
-  static const primaryDim = Color(0xFFB9BBF9);
+  /// 主色：低饱和灰雾蓝
+  static const primary = Color(0xFF476582);
+  static const primarySoft = Color(0xFFE9EFF5);
+  static const primaryDim = Color(0xFF7C97AD);
 
   /// 文字
-  static const textMain = Color(0xFF111827);
-  static const textSub = Color(0xFF6B7280);
-  static const textFaint = Color(0xFF9CA3AF);
+  static const textMain = Color(0xFF1F242C);
+  static const textSub = Color(0xFF4A505C);
+  static const textFaint = Color(0xFF888F9B);
 
   /// 极淡分隔线
-  static const divider = Color(0xFFEFF1F4);
+  static const divider = Color(0xFFE5E7EB);
 
   /// 卡片细边框（gray-200，取代重阴影）
   static const cardBorder = Color(0xFFE5E7EB);
 
   /// 导航选中：indigo-50 底 + indigo-700 字
-  static const navSelectedBg = Color(0xFFEEF2FF);
-  static const navSelectedText = Color(0xFF4338CA);
+  static const navSelectedBg = Color(0xFFE9EFF5);
+  static const navSelectedText = Color(0xFF35526B);
 
   /// 状态色
-  static const success = Color(0xFF22C55E);
-  static const warning = Color(0xFFF59E0B);
-  static const danger = Color(0xFFEF4444);
+  static const success = Color(0xFF369869); // 运行墨绿
+  static const warning = Color(0xFFD49848); // 等待土黄
+  static const danger = Color(0xFFC95757); // 报错砖红
 
   /// 深色模式
   static const darkBg = Color(0xFF17181C);

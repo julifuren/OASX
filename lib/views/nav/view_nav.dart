@@ -21,6 +21,7 @@ import 'package:oasx/utils//platform_utils.dart';
 
 part '../../controller/ctrl_nav.dart';
 part './tree_menu_view.dart';
+part './simple_tree.dart';
 
 class Nav extends StatelessWidget {
   const Nav({Key? key}) : super(key: key);
