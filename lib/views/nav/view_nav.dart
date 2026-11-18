@@ -16,6 +16,7 @@ import 'package:oasx/views/overview/overview_view.dart';
 import 'package:oasx/api/api_client.dart';
 
 import 'package:oasx/config/translation/i18n_content.dart';
+import 'package:oasx/config/ui.dart';
 import 'package:oasx/utils//platform_utils.dart';
 
 part '../../controller/ctrl_nav.dart';
@@ -45,17 +46,140 @@ class Nav extends StatelessWidget {
 
   Widget _navigationRail(BuildContext context) {
     return GetX<NavCtrl>(builder: (controller) {
-      return NavigationRail(
-        selectedIndex: controller.selectedIndex.value,
-        onDestinationSelected: (value) => {controller.switchScript(value)},
-        labelType: NavigationRailLabelType.all, // 就是是否显示文字
-        // elevation: 20, // 影深度
-        useIndicator: true, // 指示器
-        trailing: _trailing(context),
-        minWidth: 48,
-        destinations: _destinations(context, controller.navNameList),
+      final names = controller.navNameList.isEmpty
+          ? <String>['Home', 'oas1']
+          : controller.navNameList;
+      final dark = Theme.of(context).brightness == Brightness.dark;
+      return Container(
+        width: 96,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: dark
+                ? const [AppColors.darkRailTop, AppColors.darkRailBottom]
+                : const [AppColors.railTop, AppColors.railBottom],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: dark ? 0.35 : 0.04),
+              blurRadius: 18,
+              offset: const Offset(2, 0),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            for (var i = 0; i < names.length; i++)
+              _navItem(context, controller, names[i], i,
+                  controller.selectedIndex.value == i),
+            _trailing(context),
+          ],
+        ),
       );
     });
+  }
+
+  /// 单个导航项：选中态 = 淡紫底块 + 左侧高亮竖条 + 主色图标
+  Widget _navItem(BuildContext context, NavCtrl controller, String name,
+      int index, bool selected) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final isHome = name == 'Home';
+    final primary = dark ? AppColors.primaryDim : AppColors.primary;
+
+    // 脚本卡片右上角状态点
+    Color? dot;
+    if (!isHome) {
+      try {
+        final state = Get.find<ScriptService>().scriptModelMap[name]?.state.value;
+        dot = switch (state) {
+          ScriptState.running => AppColors.success,
+          ScriptState.warning => AppColors.warning,
+          ScriptState.updating => AppColors.primary,
+          _ => null,
+        };
+      } catch (_) {
+        dot = null;
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () => controller.switchScript(index),
+        onSecondaryTapDown: isHome
+            ? null
+            : (details) {
+                if (PlatformUtils.isMobile) return;
+                _showContextMenu(context, details.globalPosition, name);
+              },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          height: 54,
+          decoration: BoxDecoration(
+            color: selected
+                ? (dark ? const Color(0xFF2A2B45) : AppColors.primarySoft)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              // 左侧高亮指示条
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                width: 3,
+                height: selected ? 26 : 0,
+                margin: const EdgeInsets.only(right: 4),
+                decoration: BoxDecoration(
+                  color: primary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Icon(
+                          isHome
+                              ? Icons.home_rounded
+                              : Icons.play_circle_fill_rounded,
+                          size: 20,
+                          color: selected ? primary : AppColors.textSub,
+                        ),
+                        if (dot != null)
+                          Positioned(
+                            right: -3,
+                            top: -1,
+                            child: StatusDot(color: dot, size: 7),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      name.tr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight:
+                            selected ? FontWeight.w600 : FontWeight.w400,
+                        color: selected ? primary : AppColors.textSub,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   List<NavigationRailDestination> _destinations(

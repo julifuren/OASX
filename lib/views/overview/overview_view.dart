@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oasx/component/log/log_mixin.dart';
 import 'package:oasx/component/log/log_widget.dart';
+import 'package:oasx/config/ui.dart';
 import 'package:oasx/model/script_model.dart';
 import 'package:oasx/service/script_service.dart';
 
@@ -92,7 +93,7 @@ class _WaitingWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
         )
         .paddingAll(8)
-        .card(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
+        .softCard(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
   }
 }
 
@@ -121,7 +122,7 @@ class _PendingWidget extends StatelessWidget {
     ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
         .padding(top: 8, bottom: 0, left: 8, right: 8)
-        .card(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
+        .softCard(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
   }
 }
 
@@ -145,7 +146,7 @@ class _RunningWidget extends StatelessWidget {
     ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
         .padding(top: 8, bottom: 0, left: 8, right: 8)
-        .card(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
+        .softCard(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
   }
 }
 
@@ -206,6 +207,6 @@ class _SchedulerWidget extends StatelessWidget {
         .toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween)
         .constrained(height: 48)
         .paddingOnly(left: 8, right: 8)
-        .card(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
+        .softCard(margin: const EdgeInsets.fromLTRB(10, 0, 10, 10));
   }
 }

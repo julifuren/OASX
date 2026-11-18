@@ -426,9 +426,31 @@ class LogContent extends StatelessWidget {
           final lines = controller.filteredLogs;
           if (lines.isEmpty) {
             return Center(
-              child: Text(
-                controller.logs.isEmpty ? '暂无日志' : '当前筛选条件下没有匹配的日志',
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    controller.logs.isEmpty
+                        ? Icons.subtitles_off_outlined
+                        : Icons.search_off_rounded,
+                    size: 42,
+                    color: Colors.grey.withValues(alpha: 0.35),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    controller.logs.isEmpty ? '暂无日志' : '当前筛选条件下没有匹配的日志',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.withValues(alpha: 0.75)),
+                  ),
+                  if (controller.logs.isEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text('启动脚本后这里会实时滚动输出',
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.withValues(alpha: 0.55))),
+                  ],
+                ],
               ),
             );
           }
@@ -540,8 +562,15 @@ class LogContent extends StatelessWidget {
   }
 
   TextStyle _selectStyle(BuildContext context) {
-    return context.mediaQuery.orientation == Orientation.portrait
+    final base = context.mediaQuery.orientation == Orientation.portrait
         ? Theme.of(context).textTheme.bodySmall!
         : Theme.of(context).textTheme.titleSmall!;
+    // 日志用等宽字体，列对齐更好读
+    return base.copyWith(
+      fontFamily: 'Consolas',
+      fontFamilyFallback: const ['Menlo', 'JetBrains Mono', 'Courier New'],
+      fontSize: 12,
+      height: 1.35,
+    );
   }
 }
