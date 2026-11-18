@@ -20,10 +20,13 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 300), () {
-      //延时执行的代码
-      checkUpdate().then((value) => null);
-    });
+    // 客户端自身的更新检查已停用：
+    // 上游 L1ngz/OASX 与主仓库 nearaura/OnmyojiAutoScript 都没有发布过 Release，
+    // 接口固定返回 404，每次启动都会弹「网络错误 404」。
+    // 要恢复时把下面这行取消注释，并把 constants.dart 的 updateUrlGithub 指到有 Release 的仓库。
+    // Future.delayed(const Duration(milliseconds: 300), () {
+    //   checkUpdate().then((value) => null);
+    // });
 
     return FutureBuilder<ReadmeGithubModel>(
         future: ApiClient().getGithubReadme(),
