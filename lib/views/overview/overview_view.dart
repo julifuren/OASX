@@ -170,30 +170,38 @@ class _SchedulerWidget extends StatelessWidget {
                 size: 22,
               ),
             ScriptState.inactive =>
-              const Icon(Icons.donut_large, size: 26, color: Colors.grey),
+              const Icon(Icons.donut_large, size: 24, color: Colors.grey),
             ScriptState.warning =>
-              const SpinKitDoubleBounce(color: Colors.orange, size: 26),
+              const SpinKitDoubleBounce(color: Colors.orange, size: 24),
             ScriptState.updating => const Icon(Icons.browser_updated_rounded,
-                size: 26, color: Colors.blue),
+                size: 24, color: Colors.blue),
           };
         }),
-        Obx(() {
-          return IconButton(
-            onPressed: () => controller.restartScript(),
-            icon: const Icon(Icons.restart_alt_rounded),
-            tooltip: '重启脚本',
-            iconSize: 22,
-          );
-        }),
+        // 一键重启：停止 -> 等状态离开 running -> 启动
+        IconButton(
+          onPressed: () => controller.restartScript(),
+          icon: const Icon(Icons.restart_alt_rounded),
+          tooltip: '重启脚本',
+          iconSize: 20,
+          padding: EdgeInsets.zero,
+          visualDensity: VisualDensity.compact,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+        ),
         Obx(() {
           return IconButton(
             onPressed: () => {controller.toggleScript()},
             icon: const Icon(Icons.power_settings_new_rounded),
+            iconSize: 22,
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             isSelected:
                 controller.scriptModel.state.value == ScriptState.running,
           );
         }),
-      ].toRow(mainAxisAlignment: MainAxisAlignment.center)
+      ].toRow(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min)
     ]
         .toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween)
         .constrained(height: 48)
