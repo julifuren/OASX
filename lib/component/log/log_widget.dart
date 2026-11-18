@@ -195,6 +195,8 @@ class TopLogPanel extends StatelessWidget {
               if (enableCollapse ?? true) _collapseButton(),
             ],
           ).paddingAll(8).constrained(height: 48),
+          // 搜索 + 级别筛选 + 暂停 + 导出
+          _LogFilterBar(controller: controller),
           // 底部
           if (bottomChild != null) ...[
             const Divider(height: 1),
@@ -242,6 +244,162 @@ class TopLogPanel extends StatelessWidget {
   }
 }
 
+/// 日志筛选栏：搜索关键字、按级别过滤、暂停、导出
+class _LogFilterBar extends StatefulWidget {
+  final LogMixin controller;
+
+  const _LogFilterBar({required this.controller});
+
+  @override
+  State<_LogFilterBar> createState() => _LogFilterBarState();
+}
+
+class _LogFilterBarState extends State<_LogFilterBar> {
+  late final TextEditingController _text =
+      TextEditingController(text: widget.controller.searchText.value);
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  String _label(LogLevelFilter level) => switch (level) {
+        LogLevelFilter.all => '全部',
+        LogLevelFilter.info => 'INFO',
+        LogLevelFilter.warning => 'WARNING',
+        LogLevelFilter.error => 'ERROR',
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = widget.controller;
+    final dividerColor = Theme.of(context).dividerColor;
+
+    Widget levelMenu() {
+      return Obx(() {
+        final level = controller.levelFilter.value;
+        final counts = controller.levelCounts;
+        final active = level != LogLevelFilter.all;
+        return PopupMenuButton<LogLevelFilter>(
+          tooltip: '按级别筛选',
+          onSelected: controller.setLevelFilter,
+          itemBuilder: (_) => [
+            for (final item in [
+              (LogLevelFilter.all, '全部', Icons.list_alt, Colors.grey),
+              (LogLevelFilter.info, 'INFO', Icons.info_outline, Colors.blueGrey),
+              (LogLevelFilter.warning, 'WARNING', Icons.warning_amber_rounded,
+                  Colors.orange),
+              (LogLevelFilter.error, 'ERROR', Icons.error_outline, Colors.red),
+            ])
+              PopupMenuItem<LogLevelFilter>(
+                value: item.$1,
+                child: Row(
+                  children: [
+                    Icon(item.$3, size: 16, color: item.$4),
+                    const SizedBox(width: 6),
+                    Text(item.$2, style: const TextStyle(fontSize: 12)),
+                    const Spacer(),
+                    Text('${counts[item.$1] ?? 0}',
+                        style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  ],
+                ),
+              ),
+          ],
+          child: Container(
+            height: 32,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                  color: active && level == LogLevelFilter.error
+                      ? Colors.red
+                      : dividerColor),
+              color: active ? Colors.orange.withValues(alpha: 0.12) : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.filter_alt_outlined,
+                    size: 15,
+                    color: level == LogLevelFilter.error ? Colors.red : null),
+                const SizedBox(width: 3),
+                Text(_label(level), style: const TextStyle(fontSize: 11)),
+              ],
+            ),
+          ),
+        );
+      });
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 32,
+              child: TextField(
+                controller: _text,
+                onChanged: controller.setSearchText,
+                style: const TextStyle(fontSize: 12),
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: '搜索日志关键字',
+                  hintStyle: const TextStyle(fontSize: 12),
+                  prefixIcon: const Icon(Icons.search, size: 15),
+                  prefixIconConstraints:
+                      const BoxConstraints(minWidth: 26, minHeight: 26),
+                  suffixIcon: Obx(() => controller.searchText.value.isEmpty
+                      ? const SizedBox.shrink()
+                      : InkWell(
+                          onTap: () {
+                            _text.clear();
+                            controller.setSearchText('');
+                          },
+                          child: const Icon(Icons.close, size: 13),
+                        )),
+                  suffixIconConstraints:
+                      const BoxConstraints(minWidth: 22, minHeight: 22),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6)),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          levelMenu(),
+          // 暂停：冻结界面滚动，方便盯住当前几行
+          Obx(() => IconButton(
+                tooltip: controller.paused.value ? '继续刷新' : '暂停刷新',
+                iconSize: 18,
+                visualDensity: VisualDensity.compact,
+                constraints:
+                    const BoxConstraints(minWidth: 32, minHeight: 32),
+                onPressed: controller.togglePause,
+                icon: Icon(
+                  controller.paused.value
+                      ? Icons.play_arrow_rounded
+                      : Icons.pause_rounded,
+                  color: controller.paused.value ? Colors.orange : null,
+                ),
+              )),
+          IconButton(
+            tooltip: '导出当前筛选结果',
+            iconSize: 18,
+            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            onPressed: controller.exportLogs,
+            icon: const Icon(Icons.download_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// 日志内容区
 class LogContent extends StatelessWidget {
   final LogMixin controller;
@@ -264,27 +422,62 @@ class LogContent extends StatelessWidget {
           onUserScroll();
           return false;
         },
-        child: Obx(() => ListView.builder(
-              controller: scrollController,
-              itemCount: controller.logs.length,
-              itemBuilder: (context, index) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 1),
+        child: Obx(() {
+          final lines = controller.filteredLogs;
+          if (lines.isEmpty) {
+            return Center(
+              child: Text(
+                controller.logs.isEmpty ? '暂无日志' : '当前筛选条件下没有匹配的日志',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            );
+          }
+          return ListView.builder(
+            controller: scrollController,
+            itemCount: lines.length,
+            itemBuilder: (context, index) {
+              final line = lines[index];
+              final upper = line.toUpperCase();
+              final isError =
+                  upper.contains('ERROR') || upper.contains('CRITICAL');
+              final isWarning = upper.contains('WARNING');
+              return Container(
+                color: isError
+                    ? Colors.red.withValues(alpha: 0.10)
+                    : isWarning
+                        ? Colors.orange.withValues(alpha: 0.08)
+                        : null,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
                 child: EasyRichText(
-                  controller.logs[index],
+                  line,
                   patternList: _buildPatterns(),
                   selectable: true,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   defaultStyle: _selectStyle(context),
                 ),
-              ),
-            ).paddingAll(10)),
+              );
+            },
+          ).paddingAll(10);
+        }),
       ),
     ).constrained(width: double.infinity, height: double.infinity);
   }
 
   List<EasyRichTextPattern> _buildPatterns() {
+    final keyword = controller.searchText.value.trim();
     return [
+      // 搜索命中高亮（放在最前面，优先级最高）
+      if (keyword.isNotEmpty)
+        EasyRichTextPattern(
+          targetString: RegExp(RegExp.escape(keyword), caseSensitive: false),
+          style: const TextStyle(
+            backgroundColor: Color(0xFFffe082),
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       const EasyRichTextPattern(
         targetString: 'INFO',
         style: TextStyle(
