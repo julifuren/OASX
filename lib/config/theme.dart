@@ -63,6 +63,7 @@ ThemeData lightTheme = ThemeData(
     surfaceTintColor: Colors.transparent,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(AppSpec.radiusCard),
+      side: const BorderSide(color: AppColors.cardBorder),
     ),
     margin: EdgeInsets.zero,
   ),
@@ -158,6 +159,7 @@ ThemeData darkTheme = ThemeData(
     surfaceTintColor: Colors.transparent,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(AppSpec.radiusCard),
+      side: const BorderSide(color: AppColors.darkDivider),
     ),
     margin: EdgeInsets.zero,
   ),

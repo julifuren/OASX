@@ -50,8 +50,9 @@ class Nav extends StatelessWidget {
           ? <String>['Home', 'oas1']
           : controller.navNameList;
       final dark = Theme.of(context).brightness == Brightness.dark;
+      final scripts = names.where((e) => e != 'Home').toList();
       return Container(
-        width: 96,
+        width: 176,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -60,20 +61,60 @@ class Nav extends StatelessWidget {
                 ? const [AppColors.darkRailTop, AppColors.darkRailBottom]
                 : const [AppColors.railTop, AppColors.railBottom],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: dark ? 0.35 : 0.04),
-              blurRadius: 18,
-              offset: const Offset(2, 0),
-            ),
-          ],
+          border: Border(
+            right: BorderSide(
+                color: dark ? AppColors.darkDivider : AppColors.cardBorder),
+          ),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
-            for (var i = 0; i < names.length; i++)
-              _navItem(context, controller, names[i], i,
-                  controller.selectedIndex.value == i),
+            // 品牌区
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 12, 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.primary, Color(0xFF8B8DF7)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.auto_awesome,
+                        size: 15, color: Colors.white),
+                  ),
+                  const SizedBox(width: 9),
+                  Text('OASX',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
+                        color: dark ? Colors.white : AppColors.textMain,
+                      )),
+                ],
+              ),
+            ),
+            _navItem(context, controller, 'Home', 0,
+                controller.selectedIndex.value == 0),
+            // 分组标题
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 14, 12, 6),
+              child: Text('脚本',
+                  style: TextStyle(
+                      fontSize: 10,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textFaint.withValues(alpha: 0.9))),
+            ),
+            for (var i = 0; i < scripts.length; i++)
+              _navItem(context, controller, scripts[i],
+                  names.indexOf(scripts[i]),
+                  controller.selectedScript.value == scripts[i]),
             _trailing(context),
           ],
         ),
@@ -81,18 +122,18 @@ class Nav extends StatelessWidget {
     });
   }
 
-  /// 单个导航项：选中态 = 淡紫底块 + 左侧高亮竖条 + 主色图标
+  /// 单个导航项：横向 图标 + 文字，选中态 = 淡紫底块 + 左侧高亮竖条
   Widget _navItem(BuildContext context, NavCtrl controller, String name,
       int index, bool selected) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final isHome = name == 'Home';
     final primary = dark ? AppColors.primaryDim : AppColors.primary;
 
-    // 脚本卡片右上角状态点
     Color? dot;
     if (!isHome) {
       try {
-        final state = Get.find<ScriptService>().scriptModelMap[name]?.state.value;
+        final state =
+            Get.find<ScriptService>().scriptModelMap[name]?.state.value;
         dot = switch (state) {
           ScriptState.running => AppColors.success,
           ScriptState.warning => AppColors.warning,
@@ -105,9 +146,9 @@ class Nav extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: InkWell(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         onTap: () => controller.switchScript(index),
         onSecondaryTapDown: isHome
             ? null
@@ -116,65 +157,51 @@ class Nav extends StatelessWidget {
                 _showContextMenu(context, details.globalPosition, name);
               },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 140),
           curve: Curves.easeOut,
-          height: 54,
+          height: 38,
           decoration: BoxDecoration(
             color: selected
                 ? (dark ? const Color(0xFF2A2B45) : AppColors.primarySoft)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
-              // 左侧高亮指示条
               AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
+                duration: const Duration(milliseconds: 140),
                 width: 3,
-                height: selected ? 26 : 0,
-                margin: const EdgeInsets.only(right: 4),
+                height: selected ? 18 : 0,
                 decoration: BoxDecoration(
                   color: primary,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
+              const SizedBox(width: 9),
+              Icon(
+                isHome ? Icons.home_rounded : Icons.play_circle_fill_rounded,
+                size: 17,
+                color: selected ? primary : AppColors.textSub,
+              ),
+              const SizedBox(width: 8),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Icon(
-                          isHome
-                              ? Icons.home_rounded
-                              : Icons.play_circle_fill_rounded,
-                          size: 20,
-                          color: selected ? primary : AppColors.textSub,
-                        ),
-                        if (dot != null)
-                          Positioned(
-                            right: -3,
-                            top: -1,
-                            child: StatusDot(color: dot, size: 7),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      name.tr,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight:
-                            selected ? FontWeight.w600 : FontWeight.w400,
-                        color: selected ? primary : AppColors.textSub,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  name.tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    color:
+                        selected ? primary : (dark ? Colors.white70 : AppColors.textMain),
+                  ),
                 ),
               ),
+              if (dot != null) ...[
+                StatusDot(color: dot, size: 6),
+                const SizedBox(width: 10),
+              ] else
+                const SizedBox(width: 10),
             ],
           ),
         ),

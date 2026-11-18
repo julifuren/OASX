@@ -3,6 +3,7 @@ import 'package:oasx/views/layout/appbar.dart';
 
 import 'package:oasx/views/nav/view_nav.dart';
 import 'package:oasx/views/layout/content.dart';
+import 'package:oasx/views/layout/page_header.dart';
 
 class DesktopLayoutView extends StatelessWidget {
   const DesktopLayoutView({Key? key}) : super(key: key);
@@ -22,7 +23,12 @@ class DesktopLayoutView extends StatelessWidget {
         const Nav(),
         const TreeMenuView(),
         Expanded(
-          child: Center(child: content()),
+          child: Column(
+            children: [
+              const PageHeader(),
+              Expanded(child: Center(child: content())),
+            ],
+          ),
         )
       ],
     );

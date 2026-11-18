@@ -28,6 +28,9 @@ class AppColors {
   /// 极淡分隔线
   static const divider = Color(0xFFEFF1F4);
 
+  /// 卡片细边框（取代重阴影）
+  static const cardBorder = Color(0xFFECEEF2);
+
   /// 状态色
   static const success = Color(0xFF22C55E);
   static const warning = Color(0xFFF59E0B);
@@ -53,9 +56,9 @@ class AppSpec {
     final dark = brightness == Brightness.dark;
     return [
       BoxShadow(
-        color: Colors.black.withValues(alpha: dark ? 0.35 : 0.07),
-        blurRadius: 24,
-        offset: const Offset(0, 6),
+        color: Colors.black.withValues(alpha: dark ? 0.25 : 0.025),
+        blurRadius: 8,
+        offset: const Offset(0, 2),
       ),
     ];
   }
@@ -123,6 +126,11 @@ class _SoftCardState extends State<SoftCard> {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(widget.radius),
+          border: Border.all(
+            color: brightness == Brightness.dark
+                ? AppColors.darkDivider
+                : AppColors.cardBorder,
+          ),
           boxShadow: _hover && widget.hoverable
               ? AppSpec.hoverShadow(brightness)
               : AppSpec.softShadow(brightness),
