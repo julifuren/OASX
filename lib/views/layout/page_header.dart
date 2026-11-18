@@ -77,10 +77,10 @@ class PageHeader extends StatelessWidget {
             if (!isHome)
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: dark ? AppColors.darkCard : Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                       color: dark
                           ? AppColors.darkDivider
@@ -91,12 +91,12 @@ class PageHeader extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    StatusDot(color: stateColor, size: 7),
-                    const SizedBox(width: 7),
+                    StatusDot(color: stateColor, size: 6),
+                    const SizedBox(width: 6),
                     Text(
                       script,
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: dark ? Colors.white : AppColors.textMain,
                       ),
@@ -104,7 +104,7 @@ class PageHeader extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       stateText,
-                      style: TextStyle(fontSize: 11, color: stateColor),
+                      style: TextStyle(fontSize: 10.5, color: stateColor),
                     ),
                   ],
                 ),

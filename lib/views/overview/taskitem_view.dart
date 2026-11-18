@@ -8,12 +8,25 @@ class TaskItemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (model.isAllEmpty()) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 7),
-        child: Text(
-          '空闲中',
-          style: TextStyle(
-              fontSize: 11, color: Colors.grey.withValues(alpha: 0.65)),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.nightlight_round,
+                  size: 16, color: Colors.grey.withValues(alpha: 0.28)),
+              const SizedBox(width: 7),
+              Text(
+                '空闲中',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  letterSpacing: 0.3,
+                  color: Colors.grey.withValues(alpha: 0.5),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }

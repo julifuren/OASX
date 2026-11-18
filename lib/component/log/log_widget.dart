@@ -184,6 +184,7 @@ class TopLogPanel extends StatelessWidget {
           // 顶部按钮控制面板
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(title,
                   textAlign: TextAlign.left,
@@ -194,7 +195,7 @@ class TopLogPanel extends StatelessWidget {
               if (enableClear ?? true) _deleteButton(),
               if (enableCollapse ?? true) _collapseButton(),
             ],
-          ).paddingAll(8).constrained(height: 48),
+          ).padding(horizontal: 12).constrained(height: 44),
           // 搜索 + 级别筛选 + 暂停 + 导出
           _LogFilterBar(controller: controller),
           // 底部
@@ -208,38 +209,65 @@ class TopLogPanel extends StatelessWidget {
   }
 
   Widget _copyButton() {
-    return IconButton(
-      icon: const Icon(Icons.content_copy_rounded, size: 18),
+    return _compactIconButton(
+      icon: Icons.content_copy_rounded,
       onPressed: () => controller.copyLogs(),
+      tooltip: '复制全部日志',
+    );
+  }
+
+  /// 统一的紧凑图标按钮：32x32 命中区，图标居中，避免与搜索框不对齐
+  Widget _compactIconButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    String? tooltip,
+    Color? color,
+  }) {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: IconButton(
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        alignment: Alignment.center,
+        visualDensity: VisualDensity.compact,
+        splashRadius: 16,
+        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+        iconSize: 18,
+        onPressed: onPressed,
+        icon: Icon(icon, color: color),
+      ),
     );
   }
 
   Widget _autoScrollButton() {
-    return Obx(() => IconButton(
-          icon: Icon(
-            controller.autoScroll.value ? Icons.flash_on : Icons.flash_off,
-            size: 20,
-          ),
+    return Obx(() => _compactIconButton(
+          icon: controller.autoScroll.value
+              ? Icons.flash_on_rounded
+              : Icons.flash_off_rounded,
+          color: controller.autoScroll.value
+              ? Get.context!.theme.colorScheme.primary
+              : null,
           onPressed: controller.toggleAutoScroll,
+          tooltip: controller.autoScroll.value ? '关闭自动滚动' : '开启自动滚动',
         ));
   }
 
   Widget _deleteButton() {
-    return IconButton(
-      icon: const Icon(Icons.delete_outlined, size: 20),
+    return _compactIconButton(
+      icon: Icons.delete_outline_rounded,
       onPressed: () => controller.clearLog(),
+      tooltip: '清空日志',
     );
   }
 
   Widget _collapseButton() {
-    return Obx(() => IconButton(
-          icon: Icon(
-            controller.collapseLog.value
-                ? Icons.expand_more
-                : Icons.expand_less,
-            size: 20,
-          ),
+    return Obx(() => _compactIconButton(
+          icon: controller.collapseLog.value
+              ? Icons.expand_more_rounded
+              : Icons.expand_less_rounded,
           onPressed: () => controller.toggleCollapse(),
+          tooltip: controller.collapseLog.value ? '展开日志' : '收起日志',
         ));
   }
 }
@@ -372,27 +400,38 @@ class _LogFilterBarState extends State<_LogFilterBar> {
           const SizedBox(width: 4),
           levelMenu(),
           // 暂停：冻结界面滚动，方便盯住当前几行
-          Obx(() => IconButton(
-                tooltip: controller.paused.value ? '继续刷新' : '暂停刷新',
-                iconSize: 18,
-                visualDensity: VisualDensity.compact,
-                constraints:
-                    const BoxConstraints(minWidth: 32, minHeight: 32),
-                onPressed: controller.togglePause,
-                icon: Icon(
-                  controller.paused.value
-                      ? Icons.play_arrow_rounded
-                      : Icons.pause_rounded,
-                  color: controller.paused.value ? Colors.orange : null,
+          Obx(() => SizedBox(
+                width: 32,
+                height: 32,
+                child: IconButton(
+                  tooltip: controller.paused.value ? '继续刷新' : '暂停刷新',
+                  padding: EdgeInsets.zero,
+                  alignment: Alignment.center,
+                  iconSize: 18,
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  onPressed: controller.togglePause,
+                  icon: Icon(
+                    controller.paused.value
+                        ? Icons.play_arrow_rounded
+                        : Icons.pause_rounded,
+                    color: controller.paused.value ? Colors.orange : null,
+                  ),
                 ),
               )),
-          IconButton(
-            tooltip: '导出当前筛选结果',
-            iconSize: 18,
-            visualDensity: VisualDensity.compact,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            onPressed: controller.exportLogs,
-            icon: const Icon(Icons.download_rounded),
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: IconButton(
+              tooltip: '导出当前筛选结果',
+              padding: EdgeInsets.zero,
+              alignment: Alignment.center,
+              iconSize: 18,
+              visualDensity: VisualDensity.compact,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              onPressed: controller.exportLogs,
+              icon: const Icon(Icons.download_rounded),
+            ),
           ),
         ],
       ),
@@ -570,7 +609,7 @@ class LogContent extends StatelessWidget {
       fontFamily: 'Consolas',
       fontFamilyFallback: const ['Menlo', 'JetBrains Mono', 'Courier New'],
       fontSize: 12,
-      height: 1.35,
+      height: 1.55,
     );
   }
 }

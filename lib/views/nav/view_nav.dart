@@ -162,7 +162,7 @@ class Nav extends StatelessWidget {
           height: 38,
           decoration: BoxDecoration(
             color: selected
-                ? (dark ? const Color(0xFF2A2B45) : AppColors.primarySoft)
+                ? (dark ? const Color(0xFF2A2B45) : AppColors.navSelectedBg)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -170,8 +170,8 @@ class Nav extends StatelessWidget {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 140),
-                width: 3,
-                height: selected ? 18 : 0,
+                width: 4,
+                height: selected ? 20 : 0,
                 decoration: BoxDecoration(
                   color: primary,
                   borderRadius: BorderRadius.circular(2),
@@ -181,7 +181,7 @@ class Nav extends StatelessWidget {
               Icon(
                 isHome ? Icons.home_rounded : Icons.play_circle_fill_rounded,
                 size: 17,
-                color: selected ? primary : AppColors.textSub,
+                color: selected ? (dark ? primary : AppColors.navSelectedText) : AppColors.textSub,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -192,8 +192,9 @@ class Nav extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                    color:
-                        selected ? primary : (dark ? Colors.white70 : AppColors.textMain),
+                    color: selected
+                        ? (dark ? primary : AppColors.navSelectedText)
+                        : (dark ? Colors.white70 : AppColors.textMain),
                   ),
                 ),
               ),

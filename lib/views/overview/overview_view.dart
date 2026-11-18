@@ -80,7 +80,8 @@ class _WaitingWidget extends StatelessWidget {
     return <Widget>[
       Text(I18n.waiting.tr,
           textAlign: TextAlign.left,
-          style: Theme.of(context).textTheme.titleMedium),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.2)),
       const Divider(),
       Expanded(child: Obx(() {
         return ListView.builder(
@@ -111,16 +112,30 @@ class _PendingWidget extends StatelessWidget {
     return <Widget>[
       Text(I18n.pending.tr,
           textAlign: TextAlign.left,
-          style: Theme.of(context).textTheme.titleMedium),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.2)),
       const Divider(),
       Obx(() {
         final list = controller.scriptModel.pendingTaskList;
         if (list.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 7),
-            child: Text('队列为空',
-                style: TextStyle(
-                    fontSize: 11, color: Colors.grey.withValues(alpha: 0.65))),
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.inbox_rounded,
+                      size: 16, color: Colors.grey.withValues(alpha: 0.28)),
+                  const SizedBox(width: 7),
+                  Text('队列为空',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        letterSpacing: 0.3,
+                        color: Colors.grey.withValues(alpha: 0.5),
+                      )),
+                ],
+              ),
+            ),
           );
         }
         return SizedBox(
@@ -148,7 +163,8 @@ class _RunningWidget extends StatelessWidget {
     return <Widget>[
       Text(I18n.running.tr,
           textAlign: TextAlign.left,
-          style: Theme.of(context).textTheme.titleMedium),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.2)),
       const Divider(),
       Obx(() {
         return TaskItemView(controller.scriptModel.runningTask.value);
@@ -172,7 +188,8 @@ class _SchedulerWidget extends StatelessWidget {
     return <Widget>[
       Text(I18n.scheduler.tr,
           textAlign: TextAlign.left,
-          style: Theme.of(context).textTheme.titleMedium),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.2)),
       <Widget>[
         Obx(() {
           return switch (controller.scriptModel.state.value) {

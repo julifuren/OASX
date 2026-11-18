@@ -28,8 +28,12 @@ class AppColors {
   /// 极淡分隔线
   static const divider = Color(0xFFEFF1F4);
 
-  /// 卡片细边框（取代重阴影）
-  static const cardBorder = Color(0xFFECEEF2);
+  /// 卡片细边框（gray-200，取代重阴影）
+  static const cardBorder = Color(0xFFE5E7EB);
+
+  /// 导航选中：indigo-50 底 + indigo-700 字
+  static const navSelectedBg = Color(0xFFEEF2FF);
+  static const navSelectedText = Color(0xFF4338CA);
 
   /// 状态色
   static const success = Color(0xFF22C55E);
@@ -56,9 +60,9 @@ class AppSpec {
     final dark = brightness == Brightness.dark;
     return [
       BoxShadow(
-        color: Colors.black.withValues(alpha: dark ? 0.25 : 0.025),
-        blurRadius: 8,
-        offset: const Offset(0, 2),
+        color: Colors.black.withValues(alpha: dark ? 0.22 : 0.03),
+        blurRadius: 16,
+        offset: const Offset(0, 3),
       ),
     ];
   }
@@ -68,8 +72,8 @@ class AppSpec {
     final dark = brightness == Brightness.dark;
     return [
       BoxShadow(
-        color: Colors.black.withValues(alpha: dark ? 0.50 : 0.13),
-        blurRadius: 32,
+        color: Colors.black.withValues(alpha: dark ? 0.45 : 0.10),
+        blurRadius: 36,
         offset: const Offset(0, 12),
       ),
     ];
