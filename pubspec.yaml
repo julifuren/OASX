@@ -108,14 +108,12 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # 托盘图标（关闭窗口后从任务栏收进右下角通知区）
-  assets:
-    - assets/icons/tray_icon.ico
-
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/release.txt
     - assets/images/Icon-app.png
+    # 托盘图标（关闭窗口后从任务栏收进右下角通知区）
+    - assets/icons/tray_icon.ico
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

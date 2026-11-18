@@ -74,6 +74,12 @@ class WindowService extends GetxService with WindowListener, TrayListener {
     }
   }
 
+  /// 右键：Windows 上 setContextMenu 只是注册菜单，必须在这里主动弹出
+  @override
+  void onTrayIconRightMouseDown() {
+    trayManager.popUpContextMenu();
+  }
+
   @override
   void onTrayMenuItemClick(MenuItem menuItem) async {
     switch (menuItem.key) {
