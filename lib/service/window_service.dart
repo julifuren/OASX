@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:get_storage/get_storage.dart';
+import 'package:oasx/service/single_instance.dart';
 import 'package:oasx/utils/platform_utils.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
@@ -32,6 +33,13 @@ class WindowService extends GetxService with WindowListener, TrayListener {
         await windowManager.show();
         await windowManager.focus();
         await _initTray();
+        // 其它实例再次启动时，经由 SingleInstance 通知到这里：
+        // 由本进程自己显示窗口，避免外部 ShowWindow 后 Flutter 状态不同步（窗口闪一下）。
+        SingleInstance.onActivate = () async {
+          await windowManager.show();
+          await windowManager.restore();
+          await windowManager.focus();
+        };
       });
       windowManager.addListener(this);
       trayManager.addListener(this);

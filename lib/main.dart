@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:oasx/service/locale_service.dart';
+import 'package:oasx/service/single_instance.dart';
 import 'package:oasx/service/theme_service.dart';
 import 'package:oasx/service/websocket_service.dart';
 import 'package:oasx/service/window_service.dart';
@@ -24,16 +25,18 @@ import 'package:oasx/config/theme.dart' show lightTheme, darkTheme;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 单实例：已经有 oasx 在跑时，不新开一个，而是把已有窗口叫到前面。
+  // 单实例：已经有 oasx 在跑时，不新开一个，而是让老实例把窗口显示出来。
   // 以前每点一次图标就多一个进程 + 一个托盘图标。
   if (PlatformUtils.isWindows) {
-    if (await _acquireSingleInstanceLock()) {
-      // 拿到锁，说明是第一个实例，正常启动
-    } else if (_activateExistingWindow()) {
-      // 向已有实例交棒，自己退出
-      exit(0);
+    final isFirst = await SingleInstance.acquire();
+    if (!isFirst) {
+      // 让老实例自己显示窗口；万一来不及（正在启动中）再退化为跨进程激活
+      final notified = await SingleInstance.requestActivate();
+      if (notified || _activateExistingWindow()) {
+        exit(0);
+      }
+      // 两条路都失败时不退出，继续正常启动，避免「点了没反应」
     }
-    // 找不到已有窗口（异常情况）时不做处理，继续正常启动，避免点了没反应
   }
 
   await initService();
@@ -46,25 +49,8 @@ Future<void> main() async {
   );
 }
 
-/// 进程生命周期内保持监听的本机端口，用来判定单实例。
-/// 用端口而不是文件锁：Dart 的 FileLock 在锁被占用时会阻塞等待，不会抛异常，
-/// 结果第二个实例直接卡死在 lock()，窗口也不出来。
-ServerSocket? _instanceSocket;
-
-/// 绑定本机固定端口：成功=首个实例，失败=已有实例占着
-Future<bool> _acquireSingleInstanceLock() async {
-  try {
-    _instanceSocket = await ServerSocket.bind(
-      InternetAddress.loopbackIPv4,
-      45913,
-    );
-    return true;
-  } catch (_) {
-    return false;
-  }
-}
-
-/// 找到已运行实例的窗口，还原并置前。
+/// 兜底：直接跨进程把已有窗口显示出来。
+/// 只在老实例还没就绪、没响应端口信号时用到。
 /// 窗口标题在 windows/runner/main.cpp 里固定为 "oasx"。
 bool _activateExistingWindow() {
   const swShow = 5;
