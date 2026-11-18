@@ -179,6 +179,14 @@ class _SchedulerWidget extends StatelessWidget {
         }),
         Obx(() {
           return IconButton(
+            onPressed: () => controller.restartScript(),
+            icon: const Icon(Icons.restart_alt_rounded),
+            tooltip: '重启脚本',
+            iconSize: 22,
+          );
+        }),
+        Obx(() {
+          return IconButton(
             onPressed: () => {controller.toggleScript()},
             icon: const Icon(Icons.power_settings_new_rounded),
             isSelected:
