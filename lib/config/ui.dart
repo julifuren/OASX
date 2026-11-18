@@ -53,9 +53,9 @@ class AppSpec {
     final dark = brightness == Brightness.dark;
     return [
       BoxShadow(
-        color: Colors.black.withValues(alpha: dark ? 0.30 : 0.05),
-        blurRadius: 20,
-        offset: const Offset(0, 4),
+        color: Colors.black.withValues(alpha: dark ? 0.35 : 0.07),
+        blurRadius: 24,
+        offset: const Offset(0, 6),
       ),
     ];
   }
@@ -65,9 +65,9 @@ class AppSpec {
     final dark = brightness == Brightness.dark;
     return [
       BoxShadow(
-        color: Colors.black.withValues(alpha: dark ? 0.45 : 0.10),
-        blurRadius: 26,
-        offset: const Offset(0, 8),
+        color: Colors.black.withValues(alpha: dark ? 0.50 : 0.13),
+        blurRadius: 32,
+        offset: const Offset(0, 12),
       ),
     ];
   }

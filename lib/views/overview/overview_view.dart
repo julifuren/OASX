@@ -84,8 +84,10 @@ class _WaitingWidget extends StatelessWidget {
       const Divider(),
       Expanded(child: Obx(() {
         return ListView.builder(
-            itemBuilder: (context, index) =>
-                TaskItemView(controller.scriptModel.waitingTaskList[index]),
+            itemBuilder: (context, index) {
+              final list = controller.scriptModel.waitingTaskList;
+              return TaskItemView(list[index], showDivider: index < list.length - 1);
+            },
             itemCount: controller.scriptModel.waitingTaskList.length);
       }))
     ]
@@ -111,14 +113,22 @@ class _PendingWidget extends StatelessWidget {
           textAlign: TextAlign.left,
           style: Theme.of(context).textTheme.titleMedium),
       const Divider(),
-      SizedBox(
-          height: 140,
-          child: Obx(() {
-            return ListView.builder(
-                itemBuilder: (context, index) =>
-                    TaskItemView(controller.scriptModel.pendingTaskList[index]),
-                itemCount: controller.scriptModel.pendingTaskList.length);
-          }))
+      Obx(() {
+        final list = controller.scriptModel.pendingTaskList;
+        if (list.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Text('队列为空',
+                style: TextStyle(
+                    fontSize: 11, color: Colors.grey.withValues(alpha: 0.65))),
+          );
+        }
+        return SizedBox(
+            height: 140,
+            child: ListView.builder(
+                itemBuilder: (context, index) => TaskItemView(list[index]),
+                itemCount: list.length));
+      })
     ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
         .padding(top: 8, bottom: 0, left: 8, right: 8)

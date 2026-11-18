@@ -434,7 +434,7 @@ class LogContent extends StatelessWidget {
                         ? Icons.subtitles_off_outlined
                         : Icons.search_off_rounded,
                     size: 42,
-                    color: Colors.grey.withValues(alpha: 0.35),
+                    color: Colors.grey.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 10),
                   Text(

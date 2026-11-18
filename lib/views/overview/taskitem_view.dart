@@ -2,38 +2,63 @@ part of overview;
 
 class TaskItemView extends StatelessWidget {
   final TaskItemModel model;
-  const TaskItemView(this.model, {super.key});
+  final bool showDivider;
+  const TaskItemView(this.model, {super.key, this.showDivider = false});
 
   @override
   Widget build(BuildContext context) {
-    return model.isAllEmpty()
-        ? const SizedBox(height: 30)
-        : <Widget>[
+    if (model.isAllEmpty()) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7),
+        child: Text(
+          '空闲中',
+          style: TextStyle(
+              fontSize: 11, color: Colors.grey.withValues(alpha: 0.65)),
+        ),
+      );
+    }
+    final row = <Widget>[
       _name(context),
       _action(context),
     ]
         .toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween)
-        .padding(bottom: 10);
+        .padding(bottom: 8);
+    return showDivider
+        ? Column(children: [row, const ThinDivider(indent: 0, endIndent: 0)])
+        : row;
   }
 
   Widget _name(BuildContext context) {
     return <Widget>[
-      Text(model.taskName.tr, style: Theme.of(context).textTheme.labelLarge),
-      Text(model.nextRun, style: Theme.of(context).textTheme.labelMedium)
+      Text(model.taskName.tr,
+          style: Theme.of(context)
+              .textTheme
+              .labelLarge
+              ?.copyWith(fontSize: 12.5, fontWeight: FontWeight.w500)),
+      const SizedBox(height: 2),
+      Text(model.nextRun,
+          style: TextStyle(
+              fontSize: 10.5, color: Colors.grey.withValues(alpha: 0.8)))
     ].toColumn(crossAxisAlignment: CrossAxisAlignment.start);
   }
 
+  /// 次级按钮：浅色底胶囊，hover 变深
   Widget _action(BuildContext context) {
-    return OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.all(0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+    return Material(
+      color: const Color(0xFFF3F4F8),
+      borderRadius: BorderRadius.circular(999),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Get.find<NavCtrl>().switchContent(model.taskName),
+        hoverColor: const Color(0xFFE6E8F0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          child: Text(
+            I18n.task_setting.tr,
+            style: const TextStyle(fontSize: 11, color: AppColors.textSub),
           ),
         ),
-        onPressed: () => Get.find<NavCtrl>().switchContent(model.taskName),
-        child: Text(I18n.task_setting.tr,
-            style: Theme.of(context).textTheme.bodySmall))
-        .constrained(maxWidth: 100, maxHeight: 30);
+      ),
+    );
   }
 }
